@@ -12,8 +12,8 @@ import xbmcplugin
 import xbmcgui
 import xbmcaddon
 
-import XbmcHelpers
-common = XbmcHelpers
+import KodiUtils
+common = KodiUtils
 
 class Example():
     def __init__(self):
