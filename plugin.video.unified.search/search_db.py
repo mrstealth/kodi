@@ -59,7 +59,7 @@ class SearchDB:
         counter = counter + 1 if counter or counter == 0 else 1
         return counter
 
-    def  get_latest_search_id(self):
+    def get_latest_search_id(self):
         self.execute("SELECT MAX(id) FROM searches")
         return self.cursor.fetchone()[0]
 

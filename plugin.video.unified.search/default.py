@@ -1,8 +1,7 @@
 #!/usr/bin/python
 # Writer (c) 2012, MrStealth
-# Rev. 1.1.1
 # License: Attribution-NonCommercial-ShareAlike 3.0 Unported (CC BY-NC-SA 3.0)
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 
 import os
 import re
@@ -15,8 +14,8 @@ import xbmcplugin
 import xbmcgui
 import xbmcaddon
 
-import XbmcHelpers
-common = XbmcHelpers
+import KodiUtils
+common = KodiUtils
 
 import Translit as translit
 translit = translit.Translit()
@@ -122,7 +121,7 @@ class UnifiedSearchPlugin():
             # self.show(None)
 
             # print len(self.supported_addons)
-            self.notify(self.language(1000).encode('utf-8'), self.language(2000).encode('utf-8'))            
+            self.notify(self.language(1000).encode('utf-8'), self.language(2000).encode('utf-8'))
             # xbmcplugin.endOfDirectory(self.handle, False)
 
     def show(self, search_id):
@@ -145,7 +144,7 @@ class UnifiedSearchPlugin():
             if search_id or search_id == 0:
                 item = xbmcgui.ListItem("[COLOR=FFFF4000]%s[/COLOR]" % self.language(2001))
                 item.setProperty('IsPlayable', 'false')
-                xbmcplugin.addDirectoryItem(self.handle, '', item, False)                
+                xbmcplugin.addDirectoryItem(self.handle, '', item, False)
             else:
                 item = xbmcgui.ListItem(self.language(2000))
                 item.setProperty('IsPlayable', 'false')
@@ -157,7 +156,7 @@ class UnifiedSearchPlugin():
     def previous_results(self):
         self.log("Show search result")
         search_results = self.search_db.all()
-        
+
         if search_results:
             for i, result in enumerate(search_results):
                 uri = '%s?mode=show&search_id=%d' % (self.xpath, result['id'])
