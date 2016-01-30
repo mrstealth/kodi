@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addons>
-<addon id="plugin.video.filin.tv" name="[B][COLOR CFFFFFFF]Filin.tv[/COLOR][/B]" version="3.0.0" provider-name="mrstealth">
+<addon id="plugin.video.example.addon" name="[B][COLOR CFFFFFFF]Example add-on[/COLOR][/B]" version="1.0.0" provider-name="mrstealth">
     <requires>
         <import addon="xbmc.python" version="2.1.0"/>
         <import addon="script.module.kodi.utils" version="3.0.0"/>
@@ -10,22 +10,22 @@
         <provides>video</provides>
     </extension>
     <extension point= "xbmc.addon.metadata">
-        <summary>Enables watching flash enabled streams on filin.tv</summary>
-        <description>Enables watching flash enabled streams on filin.tv</description>
+        <summary>Example add-on</summary>
+        <description>Example add-on</description>
         <disclaimer>For personal use only</disclaimer>
         <platform>all</platform>
     </extension>
 </addon>
 
-  <addon id="repository.mrstealth" name="MrStealth Kodi Isengard Add-ons Repository" version="1.0.0" provider-name="mrstealth">
-    <extension point="xbmc.addon.repository" name="MrStealth Kodi Isengard Add-ons Repository">
-        <info compressed="false">https://raw.githubusercontent.com/mrstealth/kodi/isengard/addons.xml</info>
-        <checksum>https://raw.githubusercontent.com/mrstealth/kodi/isengard/addons.xml.md5</checksum>
-        <datadir zip="true">https://raw.githubusercontent.com/mrstealth/kodi/isengard/zip/</datadir>
+  <addon id="repository.mrstealth" name="MrStealth Kodi (Development - Master) Add-ons Repository" version="1.0.0" provider-name="mrstealth">
+    <extension point="xbmc.addon.repository" name="MrStealth Kodi (Development - Master) Add-ons Repository">
+        <info compressed="false">https://raw.githubusercontent.com/mrstealth/kodi/master/addons.xml</info>
+        <checksum>https://raw.githubusercontent.com/mrstealth/kodi/master/addons.xml.md5</checksum>
+        <datadir zip="true">https://raw.githubusercontent.com/mrstealth/kodi/master/zip/</datadir>
     </extension>
     <extension point="xbmc.addon.metadata">
-        <summary>MrStealth Kodi Isengard Add-ons Repository</summary>
-        <description>MrStealth Kodi Isengard Add-ons Repository</description>
+        <summary>MrStealth Kodi (Development - Master) Add-ons Repository</summary>
+        <description>MrStealth Kodi (Development - Master) Add-ons Repository</description>
         <disclaimer>For personal use only</disclaimer>
         <platform>all</platform>
     </extension>

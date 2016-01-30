@@ -1,0 +1,5 @@
+<settings>
+  <setting id="debug" type="bool" label="Enable debug output" default="false" />
+  <setting label=6001 type="labelenum" id="seasonsViewMode" values="List|Media Info" default="List"/>
+  <setting label=6002 type="labelenum" id="episodsViewMode" values="List|Media Info" default="Medai Info"/>
+</settings>
