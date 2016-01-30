@@ -7,8 +7,8 @@ import urllib
 import xbmc
 import xbmcaddon
 
-import XbmcHelpers
-common = XbmcHelpers
+import KodiUtils
+common = KodiUtils
 
 icon = xbmcaddon.Addon('script.module.favorites').getAddonInfo('icon')
 language = xbmcaddon.Addon('script.module.favorites').getLocalizedString
@@ -32,5 +32,3 @@ else:
     database.remove(params['title'])
 
     xbmc.executebuiltin("Container.Refresh")
-
-

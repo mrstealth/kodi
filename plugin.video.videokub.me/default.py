@@ -139,13 +139,10 @@ class VideoKub():
 
         search_string = title.split(' ')
 
-        # 'http://www.videokub.me/search/?q=%s' % (search_string[0] + ' ' + search_string[1])
-
-        uri = sys.argv[0] + '?mode=play&url=%s' % link
         item = xbmcgui.ListItem(title, thumbnailImage=self.icon, iconImage=self.icon)
         item.setInfo(type='Video', infoLabels={'title': title, 'overlay': xbmcgui.ICON_OVERLAY_WATCHED, 'playCount': 0})
         item.setProperty('IsPlayable', 'true')
-        xbmcplugin.addDirectoryItem(self.handle, uri, item, False)
+        xbmcplugin.addDirectoryItem(self.handle, link, item, False)
 
         xbmcplugin.endOfDirectory(self.handle, True)
 
@@ -163,6 +160,7 @@ class VideoKub():
                 keyword = kbd.getText()
         return keyword
 
+
     def search(self, keyword, unified):
         print "*** Search: unified %s" % unified
 
@@ -172,16 +170,22 @@ class VideoKub():
         if keyword:
             keyword = self.encode(keyword)
 
-            url = 'http://www.videokub.me/search/?q=%s' % (keyword)
-            response = urllib2.urlopen(url)
-            content = common.parseDOM(response.read(), "div", attrs={"class": "list_videos"})
-            videos = common.parseDOM(content, "div", attrs={"class": "short"})
+            links = []
+            titles = []
+            images = []
+            durations = []
 
-            links = common.parseDOM(videos, "a", attrs={"class": "kt_imgrc"}, ret='href')
-            titles = common.parseDOM(videos, "a", attrs={"class": "kt_imgrc"}, ret='title')
-            images = common.parseDOM(videos, "img", attrs={"class": "thumb"}, ret='src')
+            for i in range(5):
+                url = 'http://www.videokub.me/search/%d/?q=%s' % (i+1, keyword)
+                print url
+                response = urllib2.urlopen(url)
+                content = common.parseDOM(response.read(), "div", attrs={"class": "list_videos"})
+                videos = common.parseDOM(content, "div", attrs={"class": "short"})
 
-            durations = common.parseDOM(videos, "span", attrs={"class": "time"})
+                links += common.parseDOM(videos, "a", attrs={"class": "kt_imgrc"}, ret='href')
+                titles += common.parseDOM(videos, "a", attrs={"class": "kt_imgrc"}, ret='title')
+                images += common.parseDOM(videos, "img", attrs={"class": "thumb"}, ret='src')
+                durations += common.parseDOM(videos, "span", attrs={"class": "time"})
 
             if unified:
                 print "Perform unified search and return results"
@@ -212,22 +216,6 @@ class VideoKub():
 
         else:
             self.menu()
-
-
-
-# <div class="wrapper">
-#     <div class="left">
-#         <div class="middle" id="wide_col">
-#             <div class="full">
-#             <div class="title">Барбоскины - 121 серия. Семейный секрет</div>
-#             <div class="content">
-#             <div class="item">АВТОР: <a href="http://www.videokub.me/members/39/">videokub</a></div>
-#             <div class="item">
-#             <a href="http://www.videokub.me/categories/multfilmy/" title="">Mультфильмы</a>                                                    </div>
-#             <div class="item">ОПИСАНИЕ: У видео нет описания</div>
-
-
-        # xbmcplugin.endOfDirectory(self.handle, True)
 
     def play(self, url):
         item = xbmcgui.ListItem(path = url)

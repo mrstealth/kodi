@@ -27,7 +27,7 @@ import HTMLParser
 import json
 
 version = u"2.0.1"
-plugin = u"XbmcHelpers-" + version
+plugin = u"KodiUtils-" + version
 USERAGENT = u"Mozilla/5.0 (Windows NT 6.2; Win64; x64; rv:16.0.1) Gecko/20121011 Firefox/16.0.1"
 
 if hasattr(sys.modules["__main__"], "xbmc"):

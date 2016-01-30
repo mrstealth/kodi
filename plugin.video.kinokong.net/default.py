@@ -135,7 +135,6 @@ class Kinokong():
     def getFilmInfo(self, url):
         print "*** getFilmInfo for url %s " % url
 
-
         response = common.fetchPage({"link": url})
         container = common.parseDOM(response["content"], "div", attrs={"id": "container"})
         js_container = common.parseDOM(response["content"], "div", attrs={"class": "section"})
@@ -145,40 +144,27 @@ class Kinokong():
         image = common.parseDOM(container, "img", attrs={"id": "imgbigp"}, ret="src")[0]
         quality = common.parseDOM(container, "div", attrs={"class": "full-quality"})
 
-
         movie = source.split('file":"')[-1].split('"};')[0] if 'file":"' in source else None
         playlist = source.split(',pl:"')[-1].split('"};')[0] if ',pl:"' in source else None
         playlist = playlist.split('",')[0] if playlist and '",' in playlist else playlist
 
-        labels = {
-            'title': title,
-            'genre': 'genres',
-            'plot': 'description',
-            'playCount': 0,
-            'year': 1970,
-            'rating' : 0
-        }
+        image = image if image.startswith( 'http' ) else self.url + image
 
         if not playlist:
             links = movie.replace(' or ', ',').split(',') if(',' or ' or ') in movie else [movie]
             image = image if 'http' in image else self.url+image
-            format = quality[0] if quality else ''
+            quality = quality[0] if quality else ''
+            resolution = ['480P', '720P']
 
             for i, link in enumerate(links):
-                if '720p_' in link:
-                    quality = link.replace('.mp4', 'P').split('720p_')[-1]
-                else:
-                    quality = '480P'
-
-                link_title = "%s [%s - %s]" % (title, quality, format)
+                link_title = "%s [%s - %s]" % (title, resolution[i], quality)
                 link_title = link_title.replace(self.language(5002).encode('utf-8'), '').replace('720 hd', '')
 
                 uri = sys.argv[0] + '?mode=play&url=%s' % link
-                item = xbmcgui.ListItem(link_title,  iconImage=image, thumbnailImage=image)
 
-                item.setInfo(type='Video', infoLabels={})
+                item = xbmcgui.ListItem(link_title, iconImage=image, thumbnailImage=image)
                 item.setProperty('IsPlayable', 'true')
-                xbmcplugin.addDirectoryItem(self.handle, uri, item, False)
+                xbmcplugin.addDirectoryItem(self.handle, link, item, False)
 
             xbmc.executebuiltin('Container.SetViewMode(52)')
 
@@ -195,12 +181,10 @@ class Kinokong():
                     for episode in episods:
                         etitle =  episode['comment'].replace('<br>', ' ')
                         url = episode['file'].split(',')[-1] if '_720' in episode['file'] else episode['file'].split(',')[0]
-                        uri = sys.argv[0] + '?mode=play&url=%s' % url
-                        item = xbmcgui.ListItem(common.stripTags(etitle), iconImage=image, thumbnailImage=image)
 
-                        item.setInfo(type='Video', infoLabels=labels)
+                        item = xbmcgui.ListItem(common.stripTags(etitle), iconImage=image, thumbnailImage=image)
                         item.setProperty('IsPlayable', 'true')
-                        xbmcplugin.addDirectoryItem(self.handle, uri, item, False)
+                        xbmcplugin.addDirectoryItem(self.handle, url, item, False)
             else:
                 print "This is one season"
                 for episode in response['playlist']:
@@ -210,12 +194,10 @@ class Kinokong():
                         etitle = episode['commet']
 
                     url = episode['file'].split(',')[-1] if '_720' in episode['file'] else episode['file'].split(',')[0]
-                    uri = sys.argv[0] + '?mode=play&url=%s' % url
-                    item = xbmcgui.ListItem(common.stripTags(etitle), iconImage=image, thumbnailImage=image)
 
-                    item.setInfo(type='Video', infoLabels=labels)
+                    item = xbmcgui.ListItem(common.stripTags(etitle), iconImage=image, thumbnailImage=image)
                     item.setProperty('IsPlayable', 'true')
-                    xbmcplugin.addDirectoryItem(self.handle, uri, item, False)
+                    xbmcplugin.addDirectoryItem(self.handle, url, item, False)
 
             xbmc.executebuiltin('Container.SetViewMode(51)')
 
@@ -223,7 +205,6 @@ class Kinokong():
 
 
     def listGenres(self, url):
-        print "list genres"
         response = common.fetchPage({"link": url})
         menu = common.parseDOM(response["content"], "ul", attrs={"class": "reset top-menu"})
         genres = common.parseDOM(menu, "li")

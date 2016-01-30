@@ -25,7 +25,7 @@ class UnifiedSearch():
         self.language = self.addon.getLocalizedString
 
         self.addons_dir = os.path.dirname(self.path)
-        self.addon_db = os.path.join(os.path.dirname(os.path.dirname(self.path)), 'userdata/Database/Addons16.db')
+        self.addon_db = os.path.join(os.path.dirname(os.path.dirname(self.path)), 'userdata/Database/Addons19.db')
 
         self.supported_addons = self.get_supported_addons()
 
