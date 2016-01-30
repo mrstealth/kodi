@@ -1,10 +1,8 @@
-# Kodi Add-on Repository (http://kodi.tv/)
-MrStealth Kodi Add-on Repository
-
+# MrStealth Kodi Add-on repository
+Kodi Add-on Repository (http://kodi.tv/)
 
 ## Kodi Isengard Repository
 Download: https://github.com/mrstealth/kodi/blob/isengard/zip/repository.mrstealth/repository.mrstealth-1.0.0.zip
-
 
 ### Python dev links
 **Kodi 15.x Isengard: Index of Modules**
