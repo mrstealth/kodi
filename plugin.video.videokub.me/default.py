@@ -28,6 +28,7 @@ class VideoKub():
         self.profile = self.addon.getAddonInfo('profile')
 
         self.language = self.addon.getLocalizedString
+        self.translit = self.addon.getSetting('translit')
         self.inext = os.path.join(self.path, 'resources/icons/next.png')
         self.handle = int(sys.argv[1])
         self.url = 'http://www.videokub.me/'
@@ -58,11 +59,11 @@ class VideoKub():
 
     def menu(self):
         uri = sys.argv[0] + '?mode=%s&url=%s' % ("search", self.url)
-        item = xbmcgui.ListItem("[COLOR=FF00FF00][%s][/COLOR]" % self.language(1000), iconImage=self.icon, thumbnailImage=self.icon)
+        item = xbmcgui.ListItem("[B][COLOR=FF00FF00]%s[/COLOR][/B]" % self.language(1000), iconImage=self.icon, thumbnailImage=self.icon)
         xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
 
         uri = sys.argv[0] + '?mode=%s&url=%s' % ("genres", self.url)
-        item = xbmcgui.ListItem("[COLOR=FF00FFF0]%s[/COLOR]" % self.language(1003), iconImage=self.icon, thumbnailImage=self.icon)
+        item = xbmcgui.ListItem("[B][COLOR=FF00FFF0]%s[/COLOR][/B]" % self.language(1003), iconImage=self.icon, thumbnailImage=self.icon)
         xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
 
         self.index('http://www.videokub.me/latest-updates/', 1)
@@ -164,6 +165,10 @@ class VideoKub():
     def search(self, keyword, unified):
         print "*** Search: unified %s" % unified
 
+        if self.translit == 'false':
+            self.info('Translit module is disabled in the settings')
+
+
         keyword = translit.rus(keyword) if unified else self.getUserInput()
         unified_search_results = []
 
@@ -221,13 +226,13 @@ class VideoKub():
         item = xbmcgui.ListItem(path = url)
         xbmcplugin.setResolvedUrl(self.handle, True, item)
 
-    # XBMC helpers
-    def showMessage(self, msg):
-        xbmc.executebuiltin("XBMC.Notification(%s,%s, %s)" % ("Info", msg, str(5 * 1000)))
+    def info(self, message):
+        print "%s INFO: %s" % (self.id, message)
+        xbmc.executebuiltin("XBMC.Notification(%s,%s, %s)" % ("INFO", message, str(10 * 1000)))
 
-    def showErrorMessage(self, msg):
-        print msg
-        xbmc.executebuiltin("XBMC.Notification(%s,%s, %s)" % ("ERROR", msg, str(10 * 1000)))
+    def error(self, message):
+        print "%s ERROR: %s" % (self.id, message)
+        xbmc.executebuiltin("XBMC.Notification(%s,%s, %s)" % ("ERROR", message, str(10 * 1000)))
 
     # Python helpers
     def encode(self, string):

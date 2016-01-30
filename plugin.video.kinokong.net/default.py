@@ -39,7 +39,7 @@ class Kinokong():
         self.profile = self.addon.getAddonInfo('profile')
 
         self.language = self.addon.getLocalizedString
-
+        self.translit = self.addon.getSetting('translit')
         self.handle = int(sys.argv[1])
         self.params = sys.argv[2]
 
@@ -77,11 +77,11 @@ class Kinokong():
 
     def menu(self):
         uri = sys.argv[0] + '?mode=%s&url=%s' % ("search", self.url)
-        item = xbmcgui.ListItem("[COLOR=FF00FF00]%s[/COLOR]" % self.language(2000), thumbnailImage=self.icon)
+        item = xbmcgui.ListItem("[B][COLOR=FF00FF00]%s[/COLOR][/B]" % self.language(2000), thumbnailImage=self.icon)
         xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
 
         uri = sys.argv[0] + '?mode=%s&url=%s' % ("genres", self.url)
-        item = xbmcgui.ListItem("[COLOR=FF00FFF0]%s[/COLOR]" % self.language(1000), thumbnailImage=self.icon)
+        item = xbmcgui.ListItem("[B][COLOR=FF00FFF0]%s[/COLOR][/B]" % self.language(1000), thumbnailImage=self.icon)
         xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
 
         self.getCategoryItems('http://kinokong.net/films/novinki', 1)
@@ -248,23 +248,23 @@ class Kinokong():
         keyword = None
 
         if kbd.isConfirmed():
-            if self.addon.getSetting('translit') == 'true':
+            if self.translit == 'true':
                 keyword = translit.rus(kbd.getText())
             else:
                 keyword = kbd.getText()
+
         return keyword
 
-    def search(self, keyword, unified):
-        self.showErrorMessage('Not yet implemented')
 
     def search(self, keyword, unified):
+        if self.translit == 'false':
+            self.info('Translit module is disabled in the settings')
+
         keyword = translit.rus(keyword) if unified else self.getUserInput()
         unified_search_results = []
 
         if keyword:
             url = 'http://kinokong.net/index.php?do=search'
-
-
 
             # Advanced search: titles only
             values = {
@@ -335,12 +335,13 @@ class Kinokong():
         if self.debug:
             print "### %s: %s" % (self.id, message)
 
+    def info(self, message):
+        print "%s INFO: %s" % (self.id, message)
+        xbmc.executebuiltin("XBMC.Notification(%s,%s, %s)" % ("INFO", message, str(10 * 1000)))
+
     def error(self, message):
         print "%s ERROR: %s" % (self.id, message)
-
-    def showErrorMessage(self, msg):
-        print msg
-        xbmc.executebuiltin("XBMC.Notification(%s,%s, %s)" % ("ERROR", msg, str(10 * 1000)))
+        xbmc.executebuiltin("XBMC.Notification(%s,%s, %s)" % ("ERROR", message, str(10 * 1000)))
 
     def strip(self, string):
         return common.stripTags(string)

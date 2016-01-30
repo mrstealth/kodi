@@ -60,6 +60,7 @@ class OnlineLife():
         self.profile = self.addon.getAddonInfo('profile')
 
         self.language = self.addon.getLocalizedString
+        self.translit = self.addon.getSetting('translit')
         self.handle = int(sys.argv[1])
         self.url = 'http://www.online-life.cc'
 
@@ -159,7 +160,7 @@ class OnlineLife():
                 xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
 
         else:
-            self.showErrorMessage("getCategoryItems(): Bad response status%s" % response["status"])
+            self.error("getCategoryItems(): Bad response status%s" % response["status"])
 
         xbmc.executebuiltin('Container.SetViewMode(52)')
         xbmcplugin.endOfDirectory(self.handle, True)
@@ -334,7 +335,7 @@ class OnlineLife():
             item = xbmcgui.ListItem(path=video_url)
             xbmcplugin.setResolvedUrl(self.handle, True, item)
         except Exception, e:
-            self.showErrorMessage(e)
+            self.error(e)
 
     def getUserInput(self):
         kbd = xbmc.Keyboard()
@@ -350,72 +351,12 @@ class OnlineLife():
                 keyword = kbd.getText()
         return keyword
 
-    # def search(self, keyword, unified):
-        self.log("*** Search: unified %s" % unified)
-
-        keyword = translit.rus(keyword) if unified else self.getUserInput()
-        unified_search_results = []
-
-        if keyword:
-            url = 'http://go.mail.ru/search_site?fr=main&p=1&aux=Abd67k&q=%s&x=0&y=0' % keyword
-            request = urllib2.Request(url)
-            request.add_header('Host', 'go.mail.ru')
-            request.add_header('Referer', 'http://www.online-life.cc/')
-            request.add_header('User-Agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.10; rv:35.0) Gecko/20100101 Firefox/35.0')
-
-            response = urllib2.urlopen(request).read()
-
-            container = common.parseDOM(response, "ul", attrs={"class": "result js-result"})
-            posts = common.parseDOM(container, "li", attrs={"class": "result__li js-kb-wrap"})
-            results = common.parseDOM(posts, "div", attrs={"class": "result__img"})
-            titles = common.parseDOM(posts, "a", attrs={"class": "light-link"})
-            links = common.parseDOM(results, "a", ret="href")
-            images = common.parseDOM(results, "img", ret="src")
-
-            if unified:
-                self.log("Perform unified search and return results")
-
-                for i, title in enumerate(titles):
-                    title = titles[i].encode('utf-8')
-                    link = links[i]
-                    image = images[i]
-
-                    unified_search_results.append({'title':  title, 'url': link, 'image': image, 'plugin': self.id})
-
-                UnifiedSearch().collect(unified_search_results)
-
-            else:
-                if results:
-                    for i, title in enumerate(titles):
-                        title = titles[i].encode('utf-8')
-                        link = links[i]
-                        image = images[i]
-
-                        uri = sys.argv[0] + '?mode=show&url=%s' % link
-                        item = xbmcgui.ListItem(title, thumbnailImage=image)
-
-                        self.favorites.addContextMenuItem(item, {
-                            'title': title,
-                            'url': link,
-                            'image': image,
-                            'playable': False,
-                            'action': 'add',
-                            'plugin': self.id
-                        })
-
-                        xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
-
-                    xbmc.executebuiltin('Container.SetViewMode(52)')
-                else:
-                    item = xbmcgui.ListItem(self.language(2001), iconImage=self.icon, thumbnailImage=self.icon)
-                    xbmcplugin.addDirectoryItem(self.handle, '', item, True)
-
-                xbmcplugin.endOfDirectory(self.handle, True)
-        else:
-            self.menu()
 
     def search(self, keyword, unified):
         self.log("*** Search: unified %s" % unified)
+
+        if self.translit == 'false':
+            self.info('Translit module is disabled in the settings')
 
         keyword = translit.rus(keyword) if unified else self.getUserInput()
         unified_search_results = []
@@ -509,9 +450,13 @@ class OnlineLife():
         else:
             return True
 
-    def showErrorMessage(self, msg):
-        print msg
-        xbmc.executebuiltin("XBMC.Notification(%s,%s, %s)" % ("ERROR", msg, str(10 * 1000)))
+    def info(self, message):
+        print "%s INFO: %s" % (self.id, message)
+        xbmc.executebuiltin("XBMC.Notification(%s,%s, %s)" % ("INFO", message, str(10 * 1000)))
+
+    def error(self, message):
+        print "%s ERROR: %s" % (self.id, message)
+        xbmc.executebuiltin("XBMC.Notification(%s,%s, %s)" % ("ERROR", message, str(10 * 1000)))
 
     def encode(self, string):
         return string.decode('cp1251').encode('utf-8')

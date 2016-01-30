@@ -5,11 +5,11 @@
 import urllib, re, sys
 import xbmc, xbmcplugin,xbmcgui,xbmcaddon
 import HTMLParser
-import XbmcHelpers
+import KodiUtils
 import json
 
 from urllib2 import Request, urlopen, URLError
-common = XbmcHelpers
+common = KodiUtils
 
 BASE_URL = 'http://www.filin.tv'
 pluginhandle = int(sys.argv[1])
@@ -362,10 +362,10 @@ def resetFavorites():
 # Get latest income from index page
 def getRecentItems(url):
     if url==BASE_URL:
-        xbmcItem('', colorize(localize('['+language(2002)+']'), "FF00FF00"), 'SEARCH')
-        xbmcItem('', colorize(localize(language(2003)), "FF00FFF0"), 'FAVORITES')
-        xbmcItem('', colorize(localize(language(2000)), "FF00FFF0"), 'CATEGORIES')
-        xbmcItem('', colorize(localize(language(2001)), "FF00FFF0"), 'GENRES')
+        xbmcItem('', colorize(localize('[B]'+language(2002)+'[/B]'), "FF00FF00"), 'SEARCH')
+        xbmcItem('', colorize(localize('[B]'+language(2003)+'[/B]'), "FF00FFF0"), 'FAVORITES')
+        xbmcItem('', colorize(localize('[B]'+language(2000)+'[/B]'), "FF00FFF0"), 'CATEGORIES')
+        xbmcItem('', colorize(localize('[B]'+language(2001)+'[/B]'), "FF00FFF0"), 'GENRES')
 
     getItems(url)
 
