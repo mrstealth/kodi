@@ -1,6 +1,9 @@
 import os
 import xml.etree.ElementTree as XML
 
+print "Update addons.xml file and MD5"
+os.system("python xml_generator.py")
+
 for directory in os.listdir("."):
     if not directory.startswith('.'):
         if 'plugin' in directory or 'script' in directory or 'repository' in directory or 'skin' in directory:

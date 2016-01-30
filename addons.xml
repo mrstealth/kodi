@@ -1,70 +1,67 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addons>
-<addon id="plugin.video.filin.tv" name="[B][COLOR CFFFFFFF]Filin.tv[/COLOR][/B]" version="2.0.5" provider-name="mrstealth">
+<addon id="plugin.video.filin.tv" name="[B][COLOR CFFFFFFF]Filin.tv[/COLOR][/B]" version="3.0.0" provider-name="mrstealth">
     <requires>
         <import addon="xbmc.python" version="2.1.0"/>
-        <import addon="script.module.xbmc.helpers" version="2.0.0"/>
-        <import addon="script.module.translit" version="2.0.0"/>
+        <import addon="script.module.kodi.utils" version="3.0.0"/>
+        <import addon="script.module.translit" version="3.0.0"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="default.py">
         <provides>video</provides>
     </extension>
     <extension point= "xbmc.addon.metadata">
-        <summary>Browse and stream from filin.tv</summary>
-        <description>Enables watching streams on filin.tv that are flash enabled.</description>
-        <description>For personal use only</description>
+        <summary>Enables watching flash enabled streams on filin.tv</summary>
+        <description>Enables watching flash enabled streams on filin.tv</description>
+        <disclaimer>For personal use only</disclaimer>
         <platform>all</platform>
     </extension>
 </addon>
 
-    <addon id="repository.mrstealth.isengard" name="MrStealth's Kodi Isengard" version="1.0.0" provider-name="mrstealth">
-        <requires>
-            <import addon="xbmc.addon" version="12.0.0"/>
-        </requires>
-        <extension point="xbmc.addon.repository" name="MrStealth's Kodi Isengard Add-on Repository">
-            <info compressed="false">https://raw.githubusercontent.com/mrstealth/kodi/master/addons.xml</info>
-            <checksum>https://raw.githubusercontent.com/mrstealth/kodi/master/addons.xml.md5</checksum>
-            <datadir zip="true">https://raw.githubusercontent.com/mrstealth/kodi/master/zip/</datadir>
-            <hashes>false</hashes>
-        </extension>
-        <extension point="xbmc.addon.metadata">
-            <summary>MrStealth's Kodi Isengard Add-on Repository"</summary>
-            <description>MrStealth's Kodi Isengard Add-on Repository"</description>
-            <platform>all</platform>
+  <addon id="repository.mrstealth" name="MrStealth Kodi Add-ons Repository" version="1.0.0" provider-name="mrstealth">
+    <extension point="xbmc.addon.repository" name="MrStealth Kodi Add-ons Repository">
+        <info compressed="false">https://raw.githubusercontent.com/mrstealth/kodi/master/addons.xml</info>
+        <checksum>https://raw.githubusercontent.com/mrstealth/kodi/master/addons.xml.md5</checksum>
+        <datadir zip="true">https://raw.githubusercontent.com/mrstealth/kodi/master/zip/</datadir>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary>MrStealth Kodi Add-ons Repository</summary>
+        <description>MrStealth Kodi Add-ons Repository</description>
+        <disclaimer>For personal use only</disclaimer>
+        <platform>all</platform>
     </extension>
 </addon>
 
-<addon id='script.module.favorites' name='Favorites for xbmc plugins' provider-name='mrstealth' version='2.0.0'>
+<addon id='script.module.favorites' name='Favorites for kodi plugins' provider-name='mrstealth' version='3.0.0'>
   <requires>
     <import addon="xbmc.python" version="2.1.0" />
   </requires>
   <extension library="default.py" point="xbmc.service" />
   <extension point="xbmc.addon.metadata">
-    <summary lang="en">Favorites for xbmc plugins</summary>
+    <summary lang="en"></summary>
     <platform>all</platform>
   </extension>
   <extension point="xbmc.python.module" library="lib"/>
 </addon>
 
-<addon id='script.module.translit' version='2.0.0' name='Translit for xbmc plugins' provider-name='mrstealth'>
+<addon id='script.module.kodi.utils' version='3.0.0' name='Kodi helpers utils based on Parsedom module' provider-name='mrstealth'>
+  <requires>
+    <import addon="xbmc.python" version="2.1.0" />
+  </requires>
+  <extension point='xbmc.addon.metadata'>
+    <platform>all</platform>
+    <summary lang='en'>Kodi helpers utils based on Parsedom module</summary>
+  </extension>
+  <extension point='xbmc.python.module' library='lib' />
+</addon>
+
+<addon id='script.module.translit' version='3.0.0' name='Translit module for Kodi plugins' provider-name='mrstealth'>
   <requires>
     <import addon="xbmc.python" version="2.1.0" />
   </requires>
   <extension point='xbmc.service' library="default.py" />
   <extension point='xbmc.addon.metadata'>
     <platform>all</platform>
-    <summary lang='en'>Translit for xbmc plugins.</summary>
-  </extension>
-  <extension point='xbmc.python.module' library='lib' />
-</addon>
-
-<addon id='script.module.xbmc.helpers' version='2.0.0' name='Xbmc helpers module based on Parsedom module' provider-name='mrstealth'>
-  <requires>
-    <import addon="xbmc.python" version="2.1.0" />
-  </requires>
-  <extension point='xbmc.addon.metadata'>
-    <platform>all</platform>
-    <summary lang='en'>XbmcHelpers based on Parsedom module.</summary>
+    <summary lang='en'>Translit module for Kodi plugins</summary>
   </extension>
   <extension point='xbmc.python.module' library='lib' />
 </addon>

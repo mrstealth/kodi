@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # Writer (c) 2012, MrStealth
-# Rev. 2.0.4
 # -*- coding: utf-8 -*-
 
 import urllib, re, sys
