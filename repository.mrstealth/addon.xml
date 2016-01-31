@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-  <addon id="repository.mrstealth" name="MrStealth Kodi Isengard Add-ons Repository" version="1.0.0" provider-name="mrstealth">
-    <extension point="xbmc.addon.repository" name="MrStealth Kodi Isengard Add-ons Repository">
+  <addon id="repository.mrstealth" name="MrStealth Kodi Isengard" version="1.0.0" provider-name="mrstealth">
+    <extension point="xbmc.addon.repository" name="MrStealth Kodi Isengard">
         <info compressed="false">https://raw.githubusercontent.com/mrstealth/kodi/isengard/addons.xml</info>
         <checksum>https://raw.githubusercontent.com/mrstealth/kodi/isengard/addons.xml.md5</checksum>
         <datadir zip="true">https://raw.githubusercontent.com/mrstealth/kodi/isengard/zip/</datadir>
