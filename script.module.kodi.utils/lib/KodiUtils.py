@@ -368,6 +368,9 @@ def extractJS(data, function=False, variable=False, match=False, evaluate=False,
     log("Done: " + str(len(lst)))
     return lst
 
+def get(url):
+    return urllib2.urlopen(url).read()
+
 def fetchPage(params={}):
     get = params.get
     link = get("link")

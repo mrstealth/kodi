@@ -1,10 +1,10 @@
 #!/usr/bin/python
-# Writer (c) 2012, MrStealth
 # -*- coding: utf-8 -*-
+# Writer (c) 2012, MrStealth
 
 import os, sys, urllib, urllib2, cookielib
 import xbmc, xbmcplugin,xbmcgui,xbmcaddon
-import json, KodiUtils
+import re, KodiUtils
 
 common = KodiUtils
 
@@ -38,7 +38,11 @@ class MyHit():
     if mode == 'search':
         self.search()
     if mode == 'genres':
-        self.genres()
+        self.genres('genres')
+    if mode == 'compilation':
+        self.genres('compilation')
+    if mode == 'artists':
+        self.genres('artists')
     if mode == 'songs':
         self.songs(url, page)
     elif mode is None:
@@ -51,21 +55,34 @@ class MyHit():
     xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
 
     uri = sys.argv[0] + '?mode=genres'
-    item = xbmcgui.ListItem("[B][COLOR=lightseagreen]%s[/COLOR][/B]" % self.language(1000), iconImage=self.icon)
+    item = xbmcgui.ListItem("[B][COLOR=lightseagreen]Популярная музыка[/COLOR][/B]", iconImage=self.icon)
+    xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
+
+    uri = sys.argv[0] + '?mode=compilation'
+    item = xbmcgui.ListItem("[B][COLOR=lightseagreen]Популярные сборники[/COLOR][/B]", iconImage=self.icon)
+    xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
+
+    uri = sys.argv[0] + '?mode=artists'
+    item = xbmcgui.ListItem("[B][COLOR=lightseagreen]Популярные исполнители[/COLOR][/B]", iconImage=self.icon)
     xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
 
     self.songs(self.url, 1)
 
-  def genres(self):
+  def genres(self, collection):
     page = common.fetchPage({"link": self.url})
-    styles = common.parseDOM(page["content"], "div", attrs = { "class" : "module-popular" })
-    links = common.parseDOM(styles, "a", ret="href")
-    titles = common.parseDOM(styles, "a")
+
+    if collection == 'compilation':
+        container = common.parseDOM(page["content"], "div", attrs = { "class" : "module-collections" })[0]
+    elif collection == 'artists':
+        container = common.parseDOM(page["content"], "div", attrs = { "class" : "module-collections" })[1]
+    else:
+        container = common.parseDOM(page["content"], "div", attrs = { "class" : "module-popular" })[0]
+
+    links = common.parseDOM(container, "a", ret="href")
+    titles = common.parseDOM(container, "a")
 
     for i, title in enumerate(titles):
-      print links[i].encode('utf-8')
-      link = links[i]
-      uri = sys.argv[0] + '?mode=songs&url=%s' % link
+      uri = sys.argv[0] + '?mode=songs&url=%s' % links[i]
       item = xbmcgui.ListItem(title, iconImage=self.icon)
       xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
 
@@ -73,9 +90,8 @@ class MyHit():
 
   def songs(self, url, page):
     print "*** GET SONGS FOR PLAYLIST: %s" % url
-    page = common.fetchPage({"link": url})
-    container = common.parseDOM(page["content"], "div", attrs = { "class" : "module-layout" })
 
+    container = common.parseDOM(common.get(url), "div", attrs = { "class" : "module-layout" })
     playlist = common.parseDOM(container, "h1")
     artists = common.parseDOM(container, "span", attrs = { "class":"artist" })
     tracks = common.parseDOM(container, "span", attrs = { "class":"track" })
@@ -83,16 +99,16 @@ class MyHit():
     links = common.parseDOM(container, "a", attrs = { "class":"dl" }, ret="href")
     durations = common.parseDOM(container, "div", attrs = { "class":"duration" })
 
-    pagination = common.parseDOM(page["content"], "div", attrs={"class": "pagination"})
+    pagination = common.parseDOM(page, "div", attrs={"class": "pagination"})
 
     for i, link in enumerate(links):
-      song = "%s - %s"%(tracks[i], artists[i])
+        song = "%s - %s"%(tracks[i], artists[i])
 
-      item = xbmcgui.ListItem(song, iconImage=self.icon, thumbnailImage=self.icon)
-      item.addStreamInfo('audio', {})
-      item.setMimeType('audio/mpeg')
-      item.setProperty('mimetype', 'audio/mpeg')
-      item.setInfo(
+        item = xbmcgui.ListItem(song, iconImage=self.icon, thumbnailImage=self.icon)
+        item.addStreamInfo('audio', {})
+        item.setMimeType('audio/mpeg')
+        item.setProperty('mimetype', 'audio/mpeg')
+        item.setInfo(
         'music',
         {
           'title': tracks[i],
@@ -102,36 +118,30 @@ class MyHit():
           'duration' : self.duration(durations[i]),
           'rating' : '5'
         }
-      )
+        )
 
-      item.setProperty('IsPlayable', 'true')
-      xbmcplugin.addDirectoryItem(self.handle, link, item, False)
+        item.setProperty('IsPlayable', 'true')
+        xbmcplugin.addDirectoryItem(self.handle, link, item, False)
 
-    if pagination:
-        self.pagination('songs', url)
+
+    page = re.search('(\/\d+)', url)
+    if page:
+        page = str(int(page.group(0)[1:])+1)
+        url = re.sub('(\/\d+)', '/' + page, url)
+    else:
+        url += '/2'
+
+    print url
+
+    uri = sys.argv[0] + '?mode=songs&url=%s' % urllib.quote_plus(url)
+    item = xbmcgui.ListItem("[COLOR=orange]%s[/COLOR]" % self.language(1001), iconImage=self.inext)
+    xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
 
     xbmcplugin.endOfDirectory(self.handle, True)
-
-  def pagination(self, mode, url):
-      if 'page' in url:
-          page = int(url[-2:].replace('/', ''))+1
-          link = "%s%d/" % (url[:-2], page)
-      else:
-          link = url + '/2/'
-
-      uri = sys.argv[0] + '?mode=%s&url=%s' % (mode, urllib.quote_plus(link))
-      item = xbmcgui.ListItem("[COLOR=orange]%s[/COLOR]" % self.language(1001), iconImage=self.inext)
-      xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
 
   def duration(self, time):
     duration = time.split(':')
     return int(duration[0]) * 60 + int(duration[1])
-
-  # def play(self, url):
-  #   print "*** play URL %s"%url
-  #   item = xbmcgui.ListItem(path = url)
-  #   item.setProperty('mimetype', 'audio/mpeg')
-  #   xbmcplugin.setResolvedUrl(self.handle, True, item)
 
   def search(self):
     query = common.getUserInput(self.language(1000), "")
