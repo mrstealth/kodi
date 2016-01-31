@@ -85,10 +85,19 @@ class UnifiedSearch():
         return supported_addons
 
     def get_disabled_addons(self):
-        con = sqlite3.connect(self.addon_db)
-        cursor = con.cursor()
-        cursor.execute("SELECT addonID FROM disabled")
-        return [x[0] for x in cursor.fetchall()]
+        try:
+            con = sqlite3.connect(self.addon_db)
+            cursor = con.cursor()
+            cursor.execute("SELECT addonID FROM disabled")
+            return [x[0] for x in cursor.fetchall()]
+        except:
+            # Support older Kodi versions
+            addon_db = os.path.join(os.path.dirname(os.path.dirname(self.path)), 'userdata/Database/Addons16.db')
+            con = sqlite3.connect(addon_db)
+            cursor = con.cursor()
+
+            cursor.execute("SELECT addonID FROM disabled")
+            return [x[0] for x in cursor.fetchall()]
 
     def notify(self, header, msg):
         xbmc.executebuiltin("XBMC.Notification(%s,%s,%s)" % ('UnifiedSearch', self.language(2002).encode('utf-8'), '1000'))
