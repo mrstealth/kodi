@@ -156,6 +156,8 @@ class Plugin():
 
             if '999' in link:
                 video_link = link.replace('999', '')
+            elif 'm,' in link:
+                url = "http://v1.vio24.com/video/m/z/%s/%s" %(title, link.split('/')[-1:])
             else:
                 if 'm/z' in link:
                     video_link = "http://v1.vio24.com/video/m/z/" + "/".join(link.split('/')[-1:])
@@ -171,8 +173,13 @@ class Plugin():
             link = Uppod.DecodeUppodTextHash(pl.group(1))
             print "Encoded link: %s" % link
 
+            print link.find('�')
+
+
             if '999' in link:
                 url = link.replace('999', '')
+            elif 's,' in link:
+                url = "http://v1.vio24.com/video/s/z/%s/%s" %(title, link.split('/')[-1])
             else:
                 if 'm/s' in link:
                     url = "http://v1.vio24.com/video/m/s/%s/%s" %(title, link.split('/')[-1])
