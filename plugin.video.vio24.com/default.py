@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # Writer (c) 2016, MrStealth
 
-import os, sys, re, urllib, json
+import os, sys, re, urllib, urllib2, json
 import xbmc, xbmcplugin, xbmcgui, xbmcaddon
 import Uppod
 
@@ -61,6 +61,8 @@ class Plugin():
         if mode == 'genres':
             self.genres()
         if mode == 'movie':
+            self.movie(url)
+        if mode == 'show':
             self.movie(url)
         if mode == 'movies':
             self.movies(url, page)
@@ -200,6 +202,53 @@ class Plugin():
 
         xbmcplugin.endOfDirectory(self.handle, True)
 
+
+    def search(self, keyword, unified):
+        if self.translit == 'false':
+            self.info('Translit module is disabled in the settings')
+
+        if not unified:
+            keyword = common.getUserInput()
+
+        keyword = translit.rus(keyword)
+
+        unified_search_results = []
+
+        if keyword:
+            url = "http://vio24.com/index.php?do=search&subaction=search&all_word_seach=1&titleonly=3&story=%s&x=0&y=0" % urllib.quote(keyword)
+
+            print url
+            container = common.fetchPage({"link": url})['content']
+            headers = common.parseDOM(container, "b")
+            movies = common.parseDOM(container, "a", attrs={"class": "tip_trigger"})
+            links = common.parseDOM(headers, "a", ret="href")
+            titles = common.parseDOM(headers, "a")
+            images = common.parseDOM(container, "img", attrs={"width": "120"}, ret="src")
+
+            self.info("По запросу [B]'%s'[/B] найдено %d ответов" % (self.encode(keyword), len(links)))
+
+
+            if unified:
+                self.log("Perform unified search and return results")
+
+                for i, title in enumerate(titles):
+                    image = images[i] if 'http' in images[i] else self.url+images[i]
+                    unified_search_results.append({'title':  self.encode(self.strip(title)), 'url': links[i], 'image': image, 'plugin': self.id})
+
+                UnifiedSearch().collect(unified_search_results)
+
+            else:
+                for i, title in enumerate(titles):
+                    uri = sys.argv[0] + '?mode=movie&url=%s' % links[i]
+                    image = images[i] if 'http' in images[i] else self.url+images[i]
+                    item = xbmcgui.ListItem(self.encode(self.strip(title)), thumbnailImage=image)
+                    xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
+
+                xbmc.executebuiltin('Container.SetViewMode(50)')
+                xbmcplugin.endOfDirectory(self.handle, True)
+
+        else:
+            self.menu()
 
 
     def genres(self):
