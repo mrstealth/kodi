@@ -99,7 +99,7 @@ class Plugin():
         xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
 
 
-        self.movies(self.url)
+        self.movies(self.url, 1)
         # self.movies('http://vio24.com/serials_z/')
         xbmc.executebuiltin('Container.SetViewMode(52)')
         xbmcplugin.endOfDirectory(self.handle, True)
