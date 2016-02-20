@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.video.vio24.com" name="Vio24.com (UnifiedSearch)" version="3.0.0" provider-name="MrStealth">
+  <requires>
+    <import addon="xbmc.python" version="2.1.0"/>
+    <import addon="script.module.kodi.utils" version="3.0.0"/>
+    <import addon="script.module.translit" version="3.0.0"/>
+    <import addon="script.module.beautifulsoup" version="3.2.1"/>
+    <import addon="script.module.link.grabber" version="1.0.1"/>
+  </requires>
+  <extension point="xbmc.python.pluginsource" provides="video" library="default.py">
+    <provides>video</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary>Vio24.com</summary>
+    <description>Фильмы и сериалы онлай</description>
+    <disclaimer>For personal use only</disclaimer>
+    <platform>all</platform>
+  </extension>
+</addon>

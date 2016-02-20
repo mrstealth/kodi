@@ -136,6 +136,25 @@
     </extension>
 </addon>
 
+<addon id="plugin.video.vio24.com" name="Vio24.com (UnifiedSearch)" version="3.0.0" provider-name="MrStealth">
+  <requires>
+    <import addon="xbmc.python" version="2.1.0"/>
+    <import addon="script.module.kodi.utils" version="3.0.0"/>
+    <import addon="script.module.translit" version="3.0.0"/>
+    <import addon="script.module.beautifulsoup" version="3.2.1"/>
+    <import addon="script.module.link.grabber" version="1.0.1"/>
+  </requires>
+  <extension point="xbmc.python.pluginsource" provides="video" library="default.py">
+    <provides>video</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary>Vio24.com</summary>
+    <description>Фильмы и сериалы онлай</description>
+    <disclaimer>For personal use only</disclaimer>
+    <platform>all</platform>
+  </extension>
+</addon>
+
   <addon id="repository.mrstealth" name="MrStealth Kodi Isengard" version="1.0.0" provider-name="mrstealth">
     <extension point="xbmc.addon.repository" name="MrStealth Kodi Isengard">
         <info compressed="false">https://raw.githubusercontent.com/mrstealth/kodi/isengard/addons.xml</info>
@@ -173,7 +192,7 @@
   <extension point='xbmc.python.module' library='lib' />
 </addon>
 
-<addon id='script.module.link.grabber' version='1.0.0' name='Link grabber module' provider-name='mrstealth'>
+<addon id='script.module.link.grabber' version='1.0.1' name='Link grabber module' provider-name='mrstealth'>
   <requires>
     <import addon="xbmc.python" version="2.1.0" />
     <import addon="script.module.kodi.utils" version="3.0.0"/>

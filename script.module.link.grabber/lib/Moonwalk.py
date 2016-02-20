@@ -14,7 +14,9 @@ def movies(iframe):
         print 'Video link detected'
         return streams(iframe)
     elif 'serial' in iframe:
+        print 'Serial link detected'
         if ('season' and 'episode' in iframe):
+            print "GET STREAMS"
             return streams(iframe)
         elif 'season' in iframe:
             return episodes(iframe)
