@@ -102,6 +102,23 @@
   </extension>
 </addon>
 
+<addon id="plugin.video.serializm.com" name="Serializm.com (UnifiedSearch)" version="3.0.1" provider-name="MrStealth">
+  <requires>
+    <import addon="xbmc.python" version="2.1.0"/>
+    <import addon="script.module.kodi.utils" version="3.0.0"/>
+    <import addon="script.module.translit" version="3.0.0"/>
+  </requires>
+  <extension point="xbmc.python.pluginsource" provides="video" library="default.py">
+    <provides>video</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary>Serializm.com</summary>
+    <description>Лучшие сериалы онлайн на Serializm!</description>
+    <disclaimer>For personal use only</disclaimer>
+    <platform>all</platform>
+  </extension>
+</addon>
+
 <addon id="plugin.video.unified.search" name="Unified Search" version="3.0.1" provider-name="mrstealth">
   <requires>
     <import addon="xbmc.python" version="2.1.0" />
