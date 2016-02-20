@@ -59,11 +59,11 @@ class Plugin():
         if mode == 'search':
             self.search(keyword, unified)
         if mode == 'genres':
-            self.genres(url)
+            self.genres()
         if mode == 'movie':
             self.movie(url)
         if mode == 'movies':
-            self.movies(url)
+            self.movies(url, page)
         elif mode is None:
             self.menu()
 
@@ -72,13 +72,24 @@ class Plugin():
         item = xbmcgui.ListItem("[B][COLOR=FF00FF00]%s[/COLOR][/B]" % self.language(2000), thumbnailImage=self.icon)
         xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
 
+        uri = sys.argv[0] + '?mode=%s' % ("genres")
+        item = xbmcgui.ListItem("[B][COLOR=FF00FFF0]%s[/COLOR][/B]" % 'Жанры', thumbnailImage=self.icon)
+        xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
 
         uri = sys.argv[0] + '?mode=%s&url=%s' % ("movies", 'http://vio24.com/movies_z/')
         item = xbmcgui.ListItem("[B][COLOR=FF00FFF0]%s[/COLOR][/B]" % 'Фильмы', thumbnailImage=self.icon)
         xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
 
+        uri = sys.argv[0] + '?mode=%s&url=%s' % ("movies", 'http://vio24.com/movies_n/')
+        item = xbmcgui.ListItem("[B][COLOR=FF00FFF0]%s[/COLOR][/B]" % 'Фильмы отечественные', thumbnailImage=self.icon)
+        xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
+
         uri = sys.argv[0] + '?mode=%s&url=%s' % ("movies", 'http://vio24.com/serials_z/')
-        item = xbmcgui.ListItem("[B][COLOR=FF00FFF0]%s[/COLOR][/B]" % self.language(1001), thumbnailImage=self.icon)
+        item = xbmcgui.ListItem("[B][COLOR=FF00FFF0]%s[/COLOR][/B]" % "Сериалы", thumbnailImage=self.icon)
+        xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
+
+        uri = sys.argv[0] + '?mode=%s&url=%s' % ("movies", 'http://vio24.com/serials_n/')
+        item = xbmcgui.ListItem("[B][COLOR=FF00FFF0]%s[/COLOR][/B]" % "Сериалы отечественные", thumbnailImage=self.icon)
         xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
 
         uri = sys.argv[0] + '?mode=%s&url=%s' % ("movies", 'http://vio24.com/cartoons/')
@@ -91,8 +102,10 @@ class Plugin():
         xbmc.executebuiltin('Container.SetViewMode(52)')
         xbmcplugin.endOfDirectory(self.handle, True)
 
-    def movies(self, url):
-        response = common.fetchPage({"link": url})
+    def movies(self, url, page):
+        page_url = "%s/page/%s/" % (url, str(int(page)))
+        print page_url
+        response = common.fetchPage({"link": page_url})
         container = response["content"]
 
         headers = common.parseDOM(container, "b")
@@ -112,6 +125,11 @@ class Plugin():
             item.setInfo(type='Video', infoLabels={'title': titles[i], 'genre': 'genre', 'plot': 'description'})
             xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
 
+        if len(titles) == 30:
+            uri = sys.argv[0] + '?mode=%s&url=%s&page=%s' % ("movies", url, str(int(page) + 1))
+            item = xbmcgui.ListItem(self.language(9000), thumbnailImage=self.inext, iconImage=self.inext)
+            xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
+
         xbmc.executebuiltin('Container.SetViewMode(52)')
         xbmcplugin.endOfDirectory(self.handle, True)
 
@@ -122,7 +140,9 @@ class Plugin():
 
 
         mark = common.parseDOM(response["content"], "p", attrs={ "class": "btl4"})
-        title = common.parseDOM(mark, "i")[0].replace(' ', '.')
+
+        title = common.parseDOM(mark, "i")[0]
+        title= title.replace(': ', '-').replace(' ', '.')
 
         video = re.search('"file":"(.*?)"', container)
         pl = re.search('"pl":"(.*?)"', container)
@@ -130,35 +150,42 @@ class Plugin():
         print pl
         if video:
             link = Uppod.DecodeUppodTextHash(video.group(1))
-            video_link = "http://v1.vio24.com/video/f/z/" + "/".join(link.split('/')[-1:])
+            print "Encoded link: %s" % link
 
-            print link
+            if '999' in link:
+                video_link = link.replace('999', '')
+            else:
+                if 'm/z' in link:
+                    video_link = "http://v1.vio24.com/video/m/z/" + "/".join(link.split('/')[-1:])
+                else:
+                    video_link = "http://v1.vio24.com/video/f/z/" + "/".join(link.split('/')[-1:])
 
             print "Fixed link: %s" % video_link
-
 
             item = xbmcgui.ListItem(title, iconImage='image', thumbnailImage='image')
             item.setProperty('IsPlayable', 'true')
             xbmcplugin.addDirectoryItem(self.handle, video_link, item, False)
         else:
             link = Uppod.DecodeUppodTextHash(pl.group(1))
-            url = "http://v1.vio24.com/video/s/z/%s/%s" %(title, link.split('/')[-1])
-            print link
+            print "Encoded link: %s" % link
+
+            if '999' in link:
+                url = link.replace('999', '')
+            else:
+                if 'm/s' in link:
+                    url = "http://v1.vio24.com/video/m/s/%s/%s" %(title, link.split('/')[-1])
+                elif 's/z' in link:
+                    url = "http://v1.vio24.com/video/s/z/%s/%s" %(title, link.split('/')[-1])
+                elif 's/d' in link:
+                    url = "http://v1.vio24.com/video/s/d/%s/%s" %(title, link.split('/')[-1])
+
 
             print "Fixed link: %s" % url
 
-            response = common.fetchPage({"link": url})["content"]
-            response = response.strip('" ').replace('“', '"').replace('”', '')
-            response = response.replace('\\x', '').replace('\r\n', '')
-            response = response.replace('\r', '').replace('\n', '')
-            response = response.replace('\r\n', '')
-            response = response.replace('\r', '').replace('\t', '').replace('\r\n', '')
-
-            print response
-            playlist = eval(response)['playlist']
-
-
+            response = common.fetchPage({"link": url})["content"].decode("utf-8-sig").encode("utf-8")
+            playlist = json.loads(response)['playlist']
             print playlist
+
             for episode in playlist:
                 title =  episode['comment']
                 link = episode['file']
@@ -175,19 +202,54 @@ class Plugin():
 
 
 
-    def genres(self, url):
-        response = common.fetchPage({"link": url})
+    def genres(self):
+        titles = [
+            "Биография",
+            "Боевик",
+            "Вестерн",
+            "Военный",
+            "Детектив",
+            "Документальный",
+            "Драма",
+            "История",
+            "Комедия",
+            "Криминал",
+            "Мелодрама",
+            "Музыка",
+            "Приключения",
+            "Семейный",
+            "Спорт",
+            "Триллер",
+            "Ужасы",
+            "Фантастика",
+            "Фэнтези"
+        ]
 
-        container = common.parseDOM(response["content"], "div", attrs={"class": "wrap"})
-        menu = common.parseDOM(container, "ul")[0]
-        titles = common.parseDOM(menu, "a")
-        links = common.parseDOM(menu, "a", ret="href")
+        links = [
+            "http://vio24.com/biography/",
+            "http://vio24.com/action/",
+            "http://vio24.com/western/",
+            "http://vio24.com/military/",
+            "http://vio24.com/detective/",
+            "http://vio24.com/documentary/",
+            "http://vio24.com/drama/",
+            "http://vio24.com/history/",
+            "http://vio24.com/comedy/",
+            "http://vio24.com/crime/",
+            "http://vio24.com/romance/",
+            "http://vio24.com/musical/",
+            "http://vio24.com/adventures/",
+            "http://vio24.com/family/",
+            "http://vio24.com/sport/",
+            "http://vio24.com/thriller/",
+            "http://vio24.com/horror-mystic/",
+            "http://vio24.com/fantastic/",
+            "http://vio24.com/fantasy/"
+        ]
 
-        for i, title in enumerate(titles[:-1]):
-            link = self.url + links[i]
-            print link
 
-            uri = sys.argv[0] + '?mode=movies&url=%s' % urllib.quote(link)
+        for i, title in enumerate(titles):
+            uri = sys.argv[0] + '?mode=movies&url=%s' % urllib.quote(links[i])
             item = xbmcgui.ListItem(title, iconImage=self.icon)
             xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
 
