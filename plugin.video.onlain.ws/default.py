@@ -13,11 +13,11 @@ import xbmcplugin
 import xbmcgui
 import xbmcaddon
 
-import KodiUtils
-common = KodiUtils
-
 import Moonwalk
 import Kodik
+
+import KodiUtils
+common = KodiUtils
 
 import Translit as translit
 translit = translit.Translit(encoding='cp1251')
@@ -48,6 +48,7 @@ class OnlainWs():
         self.params = sys.argv[2]
 
         self.url = 'http://onlain.ws'
+        self.playback_file = os.path.join(xbmc.translatePath('special://temp'), 'temp_video_file.mp4')
 
         self.inext = os.path.join(self.path, 'resources/icons/next.png')
         self.debug = False
@@ -66,8 +67,13 @@ class OnlainWs():
         keyword = params['keyword'] if 'keyword' in params else None
         unified = params['unified'] if 'unified' in params else None
 
+
         if mode == 'play':
             self.play(url)
+        if mode == 'PlayHLS':
+            self.PlayHLS(url)
+        if mode == 'PlayHDS':
+            self.PlayHDS(url)
         if mode == 'search':
             self.search(keyword, unified)
         if mode == 'genres':
@@ -81,38 +87,43 @@ class OnlainWs():
 
     def menu(self):
         uri = sys.argv[0] + '?mode=%s&url=%s' % ("search", self.url)
-        item = xbmcgui.ListItem("[B][COLOR=FF00FF00]%s[/COLOR][/B]" % self.language(2000), thumbnailImage=self.icon)
+        item = xbmcgui.ListItem("[B][COLOR=FF00FF00]%s[/COLOR][/B]" % 'Поиск', thumbnailImage=self.icon)
         xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
 
-        uri = sys.argv[0] + '?mode=%s&url=%s' % ("genres", self.url)
-        item = xbmcgui.ListItem("[B][COLOR=lightseagreen]%s[/COLOR][/B]" % self.language(1000), thumbnailImage=self.icon)
+        uri = sys.argv[0] + '?mode=%s&url=%s' % ("category", "http://onlain.ws/filmy-2016")
+        item = xbmcgui.ListItem("[B][COLOR=lightseagreen]%s[/COLOR][/B]" % 'Новинки кино', thumbnailImage=self.icon)
         xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
 
-        uri = sys.argv[0] + '?mode=%s&url=%s' % ("category", "http://onlain.ws/zhanr/serialy/")
-        item = xbmcgui.ListItem("[B][COLOR=lightseagreen]%s[/COLOR][/B]" % self.language(1001), thumbnailImage=self.icon)
+        uri = sys.argv[0] + '?mode=%s&url=%s' % ("category", "http://onlain.ws/serialy")
+        item = xbmcgui.ListItem("[B][COLOR=lightseagreen]%s[/COLOR][/B]" % 'Сериалы', thumbnailImage=self.icon)
         xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
 
-        uri = sys.argv[0] + '?mode=%s&url=%s' % ("category", "http://onlain.ws/zhanr/multfilmy/")
-        item = xbmcgui.ListItem("[B][COLOR=lightseagreen]%s[/COLOR][/B]" % self.language(1002), thumbnailImage=self.icon)
+        uri = sys.argv[0] + '?mode=%s&url=%s' % ("category", "http://onlain.ws/multfilmy")
+        item = xbmcgui.ListItem("[B][COLOR=lightseagreen]%s[/COLOR][/B]" % 'Мультфильмы', thumbnailImage=self.icon)
         xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
 
         self.movies(self.url, 1)
+        # self.movie('http://onlain.ws/1098-lihoradka.html')
 
         xbmc.executebuiltin('Container.SetViewMode(52)')
         xbmcplugin.endOfDirectory(self.handle, True)
 
     def movies(self, url, page):
         print "*** Get category items %s" % url
-        page_url = "%s/page/%s/" % (url, str(int(page)))
+        page_url = "%s/page/%s" % (url, str(int(page)))
         print page_url
 
         content = common.fetchPage({"link": page_url})["content"]
-        movies = common.parseDOM(content, "div", attrs={"class": "shortstory"})
-        headers = common.parseDOM(movies, "h2", attrs={"class": "zagolovki"})
+        container = common.parseDOM(content, "div", attrs={"id": "dle-content"})
+
+
+        movies = common.parseDOM(container, "div", attrs={"class": "sh-block ns"})
+        headers = common.parseDOM(movies, "h2", attrs={"class": "title-main"})
+        images_container = common.parseDOM(content, "div", attrs={"class": "poster-box"})
 
         titles = common.parseDOM(headers, "a")
         links = common.parseDOM(headers, "a", ret="href")
-        images = common.parseDOM(movies, "img", ret="src")
+        images = common.parseDOM(images_container, "img", ret="src")
 
         ratings = common.parseDOM(movies, "div", attrs={"class": "titlePageSprite star-box-giga-star"})
         infos = common.parseDOM(movies, "noindex")
@@ -125,9 +136,8 @@ class OnlainWs():
             xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
 
         if not len(titles) < 10:
-            print page
             uri = sys.argv[0] + '?mode=%s&url=%s&page=%s' % ("category", url, str(int(page) + 1))
-            item = xbmcgui.ListItem(self.language(9000), thumbnailImage=self.inext, iconImage=self.inext)
+            item = xbmcgui.ListItem('следующая страница >>', thumbnailImage=self.inext, iconImage=self.inext)
             xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
 
         xbmc.executebuiltin('Container.SetViewMode(52)')
@@ -140,61 +150,147 @@ class OnlainWs():
         response = common.fetchPage({"link": url})
         iframes = common.parseDOM(response["content"], "iframe", ret="src")
 
-        try:
-            shortstorytitle = common.parseDOM(response["content"], "div", attrs={ "class": "shortstorytitle" })
-            container = common.parseDOM(response["content"], "div", attrs={ "class": "ratingimdb" })
-            kpid = common.parseDOM(container, "a", ret="href")[0].split('/')[-1].replace('.png', '')
-            title = self.strip(common.parseDOM(shortstorytitle, "h1")[0])
-            image = common.parseDOM(response["content"], "img", attrs={ "width": "200" }, ret="src")[0]
-            image = image if 'http' in image else self.url+image
+        container = common.parseDOM(response["content"], "div", attrs={ "class": "full-block view" })
+        poster = common.parseDOM(container, "div", attrs={ "class": "poster-box" })
+        rating = common.parseDOM(container, "div", attrs={ "class": "rating" })
+        title = self.strip(common.parseDOM(container, "h1")[0])
+        image = self.icon
+        iframe = iframes[0]
 
-            iframe = iframes[0]
+        print iframes
 
+        for iframe in iframes:
             if not 'http' in iframe:
                 self.error('Unknown video source')
                 return
 
+            if 'kodik.cc' in iframe:
+                print "Kodic link detected"
+                uhash = Kodik.uppodHash(iframe)
+                stream = Kodik.decode(uhash).split(',')[1]
 
-            if 'serial' in iframe:
-                seasons = Moonwalk.seasons(iframe)
-                for season in seasons:
-                    for episode in season['episodes']:
-                        title = "%s (%s)" % (episode['title'], season['title'])
-                        uri = sys.argv[0] + '?mode=playMoonwalkItem&url=%s' % urllib.quote_plus(episode['link'])
-                        item = xbmcgui.ListItem(title,  iconImage=image, thumbnailImage=image)
+                print stream
 
+                uri = sys.argv[0] + '?mode=PlayHLS&url=%s' % urllib.quote_plus(stream)
+                item = xbmcgui.ListItem(title,  iconImage=image, thumbnailImage=image)
+                item.setProperty('IsPlayable', 'true')
+                xbmcplugin.addDirectoryItem(self.handle, uri, item)
+
+            if not 'kodik.cc' in iframe:
+                try:
+                    if 'serial' in iframe:
+                        print 'season'
+                        seasons = Moonwalk.seasons(iframe)
+                        for season in seasons:
+                            for episode in season['episodes']:
+                                title = "%s (%s)" % (episode['title'], season['title'])
+                                print episode['link']
+
+                                uri = sys.argv[0] + '?mode=play&url=%s' % urllib.quote_plus(episode['link'])
+                                item = xbmcgui.ListItem(title,  iconImage=image, thumbnailImage=image)
+
+                                item.setProperty('IsPlayable', 'true')
+                                xbmcplugin.addDirectoryItem(self.handle, uri, item)
+
+                    else:
+                        streams = Moonwalk.movies(iframe)
+
+                        hls_stream = streams['manifest_m3u8']
+                        hds_stream = streams['manifest_f4m']
+
+
+                        mtitle = '%s - %s' % (title, 'HLS Stream - m3u8')
+                        uri = sys.argv[0] + '?mode=PlayHLS&url=%s' % urllib.quote_plus(hls_stream)
+                        item = xbmcgui.ListItem(mtitle,  iconImage=image, thumbnailImage=image)
                         item.setProperty('IsPlayable', 'true')
                         xbmcplugin.addDirectoryItem(self.handle, uri, item)
 
-            else:
-                moonwalk_stream = Moonwalk.movies(iframe)['manifest_m3u8']
-                mtitle = '%s - %s' % (title, 'Moonwalk')
-                item = xbmcgui.ListItem(title,  iconImage=image, thumbnailImage=image)
-                item.setProperty('IsPlayable', 'true')
-                xbmcplugin.addDirectoryItem(self.handle, moonwalk_stream, item)
 
-                quality = ['720p', '480p', '360p']
-                kodik_streams = Kodik.streams(kpid)
+                        mtitle = '%s - %s' % (title, 'HDS Stream - f4m')
+                        uri = sys.argv[0] + '?mode=PlayHDS&url=%s' % urllib.quote_plus(hds_stream)
+                        item = xbmcgui.ListItem(mtitle,  iconImage=image, thumbnailImage=image)
+                        item.setProperty('IsPlayable', 'true')
+                        xbmcplugin.addDirectoryItem(self.handle, uri, item)
 
-                for i, link in enumerate(kodik_streams):
-                    mtitle = '%s - %s [%s]' % (title, 'Kodic', quality[i])
-                    item = xbmcgui.ListItem(mtitle, iconImage=image, thumbnailImage=image)
-                    xbmcplugin.addDirectoryItem(self.handle, link, item)
-
-        except IndexError as e:
-            link = re.search('"file":"(.*?)","', response["content"]).group(1)
-            item = xbmcgui.ListItem('Трейлер',  iconImage=image, thumbnailImage=image)
-            item.setProperty('IsPlayable', 'true')
-            xbmcplugin.addDirectoryItem(self.handle, link, item)
-
+                except:
+                    print "Moonwalk exception"
+                    pass
 
         xbmc.executebuiltin('Container.SetViewMode(52)')
         xbmcplugin.endOfDirectory(self.handle, True)
 
+
+    def play(self, url):
+        # streams = Moonwalk.movies(url)
+        # hds_stream = streams['manifest_f4m']
+        #
+        # self.PlayHDS(hds_stream)
+
+        streams = Moonwalk.movies(url)
+        hls_stream = streams['manifest_m3u8']
+
+        self.PlayHLS(hls_stream)
+
+
+    def PlayHLS(self, url):
+        # 0
+        # from F4mProxy import f4mProxyHelper
+        # player = f4mProxyHelper()
+        # player.playF4mLink(link, name)
+
+        # 1
+        print 'Play URL: %s' % url
+    	item = xbmcgui.ListItem(path = url)
+    	item.setProperty('IsPlayable', 'true')
+    	xbmcplugin.setResolvedUrl(self.handle, True, item)
+
+
+        # 2
+        # use_proxy_for_chunks = True
+        #
+        # from F4mProxy import f4mProxyHelper
+        # player=f4mProxyHelper()
+        # # playF4mLink(self,url,name,proxy=None,use_proxy_for_chunks=False, maxbitrate=0, simpleDownloader=False, auth=None, streamtype='HDS',setResolved=False,swf=None):
+        #
+        # player.playF4mLink(url, 'name', None, True, maxbitrate=0, simpleDownloader=False, auth=None, streamtype='HDS',setResolved=False, swf=None)
+        #
+        # return
+
+    def PlayHDS(self, url, name = "f4mstream"):
+        from F4mProxy import f4mProxyHelper
+        player=f4mProxyHelper()
+
+        urltoplay, item= player.playF4mLink(url,name,proxy=None,use_proxy_for_chunks=False, maxbitrate=0, simpleDownloader=False, auth=None, streamtype='HDS',setResolved=False)
+        item.setProperty("IsPlayable", "true")
+        xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, item)
+
+        # # WORKS but no seeking
+    	# from F4mProxy import f4mProxyHelper
+    	# import time
+    	# helper = f4mProxyHelper()
+    	# link, stopEvent = helper.start_proxy(url, "f4mstream")
+        #
+    	# item = xbmcgui.ListItem(path = link)
+    	# item.setProperty('IsPlayable', 'true')
+    	# xbmcplugin.setResolvedUrl(self.handle, True, item)
+        #
+    	# player = xbmc.Player()
+    	# time.sleep(10)
+        #
+    	# while player.isPlaying():
+    	# 	print "WAITING FOR PLAYER TO STOP"
+    	# 	time.sleep(5)
+    	# time.sleep(10)
+    	# stopEvent.set()
+
+
+
+
     def genres(self, url):
         print "list genres"
         response = common.fetchPage({"link": url})
-        menu = common.parseDOM(response["content"], "div", attrs={"class": "mini"})[0]
+        container = common.parseDOM(response["content"], "div", attrs={"id": "dle-content"})
+        menu = common.parseDOM(container, "div", attrs={"class": "horizontal-menu ns"})
         titles = common.parseDOM(menu, "a")
         links = common.parseDOM(menu, "a", ret="href")
 
@@ -209,14 +305,7 @@ class OnlainWs():
 
         xbmcplugin.endOfDirectory(self.handle, True)
 
-    def play(self, url):
-        print "*** play url %s" % url
-        item = xbmcgui.ListItem(path=url)
-        xbmcplugin.setResolvedUrl(self.handle, True, item)
 
-    def playMoonwalkItem(self, url):
-        link = Moonwalk.streams(url)['manifest_m3u8']
-        self.play(link)
 
     def getUserInput(self):
         kbd = xbmc.Keyboard()
@@ -235,6 +324,7 @@ class OnlainWs():
     def search(self, keyword, unified):
         self.error('Not yet implemented')
 
+
     # *** Add-on helpers
     def log(self, message):
         if self.debug:
@@ -249,6 +339,43 @@ class OnlainWs():
 
     def encode(self, string):
         return string.decode('cp1251').encode('utf-8')
+
+
+class MyPlayer (xbmc.Player):
+    def __init__ (self):
+        xbmc.Player.__init__(self)
+
+    def play(self, url, listitem):
+        print 'Now im playing... %s' % url
+        self.stopPlaying.clear()
+        xbmc.Player(xbmc.PLAYER_CORE_DVDPLAYER).play(url, listitem)
+    def onPlayBackEnded( self ):
+        # Will be called when xbmc stops playing a file
+        print "seting event in onPlayBackEnded "
+        self.stopPlaying.set();
+        print "stop Event is SET"
+    def onPlayBackStopped( self ):
+        # Will be called when user stops xbmc playing a file
+        print "seting event in onPlayBackStopped "
+        self.stopPlaying.set();
+        print "stop Event is SET"
+
+# class MyPlayer(xbmc.Player) :
+#         print("[CUSTOM SCRIPT]Checking PlayBackState")
+#         def __init__ (self):
+#                 xbmc.Player.__init__(self)
+#
+#         def onPlayBackStarted(self):
+#                 if xbmc.Player().isPlayingVideo():
+#                         print("[CUSTOM SCRIPT]Video is playing")
+#                         os.system("sudo python /usr/local/share/xbmc/addons/service.procmanager/resources/stopall.py") #Calls another script to stop proce$
+#
+#         def onPlayBackEnded(self): #Dosen't seem to get called
+#                         print("[CUSTOM SCRIPT]Video isn't playing")
+#                         os.system("sudo python /usr/local/share/xbmc/addons/service.procmanager/resources/startall.py") #Calls another script to start pro$
+#
+
+
 
 
 # class URLParser():

@@ -93,25 +93,23 @@ class Kinokong():
         print "*** Get category items %s" % url
         page_url = "%s/page/%s/" % (url, str(int(page)))
         response = common.fetchPage({"link": page_url})
-        per_page = 0
 
         if response["status"] == 200:
             content = common.parseDOM(response["content"], "div", attrs={"id": "container"})
             items = common.parseDOM(content, "div", attrs={"class": "owl-item"})
 
             link_container = common.parseDOM(items, "div", attrs={"class": "main-sliders-title"})
+            images_container = common.parseDOM(items, "div", attrs={"class": "main-sliders-img"})
             titles = common.parseDOM(link_container, "a")
             links = common.parseDOM(link_container, "a", ret="href")
-            images = common.parseDOM(items, "img", ret="src")
+            images = common.parseDOM(images_container, "img", ret="src")
 
             descs = common.parseDOM(items, "i")
             pagenav = common.parseDOM(content, "div", attrs={"class": "navigation"})
 
             for i, title in enumerate(titles):
-                per_page += 1
                 title = self.strip(self.encode(title))
-
-                image = images[i] if 'http' in images[i] else self.url+images[i]
+                image = self.url + common.parseDOM(items[i], "img", ret="src")[2]
 
                 genres_cont = common.parseDOM(items[i], "em")
                 genres = common.parseDOM(genres_cont, "a")
@@ -124,7 +122,7 @@ class Kinokong():
 
                 xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
 
-        if pagenav and not per_page < 15:
+        if pagenav and not len(titles) < 15:
             uri = sys.argv[0] + '?mode=%s&url=%s&page=%s' % ("category", url, str(int(page) + 1))
             item = xbmcgui.ListItem(self.language(9000), thumbnailImage=self.inext, iconImage=self.inext)
             xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
