@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 # Writer (c) 2016, MrStealth
 
+#http://onlain.ws/filmy-2016/page/2
+#http://onlain.ws/filmy-2016/page/2/
+
 import os
 import urllib
 import urllib2
@@ -110,7 +113,7 @@ class OnlainWs():
 
     def movies(self, url, page):
         print "*** Get category items %s" % url
-        page_url = "%s/page/%s" % (url, str(int(page)))
+        page_url = "%s/page/%s/" % (url, str(int(page)))
         print page_url
 
         content = common.fetchPage({"link": page_url})["content"]
