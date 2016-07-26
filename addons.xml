@@ -35,7 +35,7 @@
   </extension>
 </addon>
 
-<addon id="plugin.video.filin.tv" name="[B][COLOR CFFFFFFF]Filin.tv[/COLOR][/B]" version="3.0.0" provider-name="mrstealth">
+<addon id="plugin.video.filin.tv" name="[B][COLOR CFFFFFFF]Filin.tv[/COLOR][/B]" version="3.0.1" provider-name="mrstealth">
     <requires>
         <import addon="xbmc.python" version="2.1.0"/>
         <import addon="script.module.kodi.utils" version="3.0.0"/>
@@ -68,14 +68,12 @@
   </extension>
 </addon>
 
-<addon id="plugin.video.onlain.ws" name="Onlain.ws (UnifiedSearch)" version="1.0.5" provider-name="MrStealth">
+<addon id="plugin.video.onlain.ws" name="Onlain.ws (UnifiedSearch)" version="1.0.6" provider-name="MrStealth">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
     <import addon="script.module.kodi.utils" version="3.0.0"/>
     <import addon="script.module.translit" version="3.0.0"/>
-    <import addon="script.module.link.grabber" version="1.0.0"/>
-    <import addon="script.video.F4mProxy" version="2.1.9"/>
-
+    <import addon="script.module.link.grabber" version="1.0.1"/>
   </requires>
   <extension point="xbmc.python.pluginsource" provides="video" library="default.py">
     <provides>video</provides>
@@ -238,7 +236,6 @@
 <addon id="skin.quartz" version="5.2" name="Quartz" provider-name="Pecinko">
   <requires>
     <import addon="xbmc.gui" version="5.9.0"/>
-    <import addon="script.favourites" version="3.0.4"/>
   </requires>
   <extension
     point="xbmc.gui.skin" defaultthemename="Textures.xbt" debugging="false">

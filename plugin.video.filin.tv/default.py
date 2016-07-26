@@ -467,22 +467,23 @@ def showItem(url, thumbnail):
 
             for season in playlist:
                 episods = season['playlist']
-
                 for episode in episods:
                     title = ('%s (%s)') % (episode['comment'], season['comment'])
+                    url = episode['file'].replace('[', '').replace(',360]', '')
                     item = xbmcgui.ListItem(title, thumbnailImage=image)
                     item.setInfo(type='video', infoLabels={'genre': 'genre', 'plot': 'desc' })
                     item.setProperty('IsPlayable', 'true')
-                    xbmcplugin.addDirectoryItem(pluginhandle, episode['file'], item, False)
+                    xbmcplugin.addDirectoryItem(pluginhandle, url, item, False)
 
         else:
             print "*** This is a playlist with one season"
             for episode in playlist:
+                url = episode['file'].replace('[', '').replace(',360]', '')
                 item = xbmcgui.ListItem(episode['comment'], thumbnailImage=image)
                 item.setInfo(type='video', infoLabels={'genre': 'genre', 'plot': 'desc' })
                 item.setProperty('IsPlayable', 'true')
 
-                xbmcplugin.addDirectoryItem(pluginhandle, episode['file'], item, False)
+                xbmcplugin.addDirectoryItem(pluginhandle, url, item, False)
 
 
     # set view mode to List2 (quarz3 skin)
@@ -499,6 +500,9 @@ def showItem(url, thumbnail):
 
 
 def playItem(url):
+    print "Play item"
+    if '480' in url:
+        url = url.replace('[', '').replace(',360]', '')
     print url
     item = xbmcgui.ListItem(path = url)
     item.setProperty('mimetype', 'video/x-flv')
