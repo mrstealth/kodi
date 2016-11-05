@@ -31,7 +31,7 @@ class VideoKub():
         self.translit = self.addon.getSetting('translit')
         self.inext = os.path.join(self.path, 'resources/icons/next.png')
         self.handle = int(sys.argv[1])
-        self.url = 'http://www.videokub.me/'
+        self.url = 'http://videokub.net/'
 
     def main(self):
         params = common.getParameters(sys.argv[2])
@@ -66,12 +66,12 @@ class VideoKub():
         item = xbmcgui.ListItem("[B][COLOR=FF00FFF0]%s[/COLOR][/B]" % self.language(1003), iconImage=self.icon, thumbnailImage=self.icon)
         xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
 
-        self.index('http://www.videokub.me/latest-updates/', 1)
+        self.index('http://videokub.net/latest-updates/', 1)
         xbmcplugin.endOfDirectory(self.handle, True)
 
     def genres(self):
 
-        url = 'http://www.videokub.me/categories/'
+        url = 'http://videokub.net/categories/'
         response = common.fetchPage({"link": url})
         block_content = common.parseDOM(response["content"], "div", attrs={"class": "block_content"})
 
@@ -181,9 +181,17 @@ class VideoKub():
             durations = []
 
             for i in range(5):
-                url = 'http://www.videokub.me/search/%d/?q=%s' % (i+1, keyword)
-                print url
-                response = urllib2.urlopen(url)
+                # http://videokub.net/search/?q=Masha&search=%D0%9D%D0%B0%D0%B9%D1%82%D0%B8
+                url = 'http://videokub.net/search/%d/?q=%s&search=Найти' % (i+1, keyword)
+                xbmc.log(url)
+
+                request = urllib2.Request(url)
+                request.add_header('Host', 'videokub.net')
+                request.add_header('User-Agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2872.0 Safari/537.36')
+                request.add_header('Upgrade-Insecure-Requests', '1')
+
+
+                response = urllib2.urlopen(request)
                 content = common.parseDOM(response.read(), "div", attrs={"class": "list_videos"})
                 videos = common.parseDOM(content, "div", attrs={"class": "short"})
 
@@ -211,7 +219,7 @@ class VideoKub():
                     xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
 
                 # TODO: Fix search pagination
-                # http://www.videokub.me/search/2/?q=%D0%B1%D0%B0%D1%80%D0%B1%D0%BE%D1%81%D0%BA&search=%D0%9D%D0%B0%D0%B9%D1%82%D0%B8
+                # http://videokub.net/search/2/?q=%D0%B1%D0%B0%D1%80%D0%B1%D0%BE%D1%81%D0%BA&search=%D0%9D%D0%B0%D0%B9%D1%82%D0%B8
                 #uri = sys.argv[0] + '?mode=%s&url=%s' % ("show", url)
                 #item = xbmcgui.ListItem(self.language(1004), iconImage=self.inext)
                 #xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
