@@ -131,12 +131,23 @@ class Kinokong():
         xbmcplugin.endOfDirectory(self.handle, True)
 
     def getFilmInfo(self, url):
-        print "*** getFilmInfo for url %s " % url
+        xbmc.log("*** getFilmInfo for url %s " % url)
+        xbmc.log(url)
 
         response = common.fetchPage({"link": url})
         container = common.parseDOM(response["content"], "div", attrs={"id": "container"})
         js_container = common.parseDOM(response["content"], "div", attrs={"class": "section"})
-        source = common.parseDOM(js_container, "script", attrs={"type": "text/javascript"})[0]
+        sources = common.parseDOM(js_container, "script", attrs={"type": "text/javascript"})
+        source = sources[6]
+
+        for i, script in enumerate(sources):
+            if 'mp4' in script:
+                xbmc.log('%d - ################################################' % i)
+                xbmc.log(script)
+
+                source = script
+                break
+
 
         title = self.encode(common.parseDOM(container, "h1")[0])
         image = common.parseDOM(container, "img", attrs={"id": "imgbigp"}, ret="src")[0]

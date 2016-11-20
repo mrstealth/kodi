@@ -52,7 +52,7 @@
     </extension>
 </addon>
 
-<addon id="plugin.video.kinokong.net" name="Kinokong.net (UnifiedSearch)" version="3.0.1" provider-name="MrStealth">
+<addon id="plugin.video.kinokong.net" name="Kinokong.net (UnifiedSearch)" version="3.0.2" provider-name="MrStealth">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
     <import addon="script.module.kodi.utils" version="3.0.0"/>
@@ -63,23 +63,6 @@
   </extension>
   <extension point="xbmc.addon.metadata">
     <summary>Kinokong.net</summary>
-    <description>For personal use only</description>
-    <platform>all</platform>
-  </extension>
-</addon>
-
-<addon id="plugin.video.onlain.ws" name="Onlain.ws (UnifiedSearch)" version="1.0.6" provider-name="MrStealth">
-  <requires>
-    <import addon="xbmc.python" version="2.1.0"/>
-    <import addon="script.module.kodi.utils" version="3.0.0"/>
-    <import addon="script.module.translit" version="3.0.0"/>
-    <import addon="script.module.link.grabber" version="1.0.1"/>
-  </requires>
-  <extension point="xbmc.python.pluginsource" provides="video" library="default.py">
-    <provides>video</provides>
-  </extension>
-  <extension point="xbmc.addon.metadata">
-    <summary>Onlain.ws</summary>
     <description>For personal use only</description>
     <platform>all</platform>
   </extension>
@@ -98,23 +81,6 @@
   <extension point="xbmc.addon.metadata">
     <summary>Enables watching streams on online-life.cc</summary>
     <description>For personal use only</description>
-    <platform>all</platform>
-  </extension>
-</addon>
-
-<addon id="plugin.video.serializm.com" name="Serializm.com (UnifiedSearch)" version="3.0.1" provider-name="MrStealth">
-  <requires>
-    <import addon="xbmc.python" version="2.1.0"/>
-    <import addon="script.module.kodi.utils" version="3.0.0"/>
-    <import addon="script.module.translit" version="3.0.0"/>
-  </requires>
-  <extension point="xbmc.python.pluginsource" provides="video" library="default.py">
-    <provides>video</provides>
-  </extension>
-  <extension point="xbmc.addon.metadata">
-    <summary>Serializm.com</summary>
-    <description>Лучшие сериалы онлайн на Serializm!</description>
-    <disclaimer>For personal use only</disclaimer>
     <platform>all</platform>
   </extension>
 </addon>
@@ -151,25 +117,6 @@
         <description>For personal use only</description>
         <platform>all</platform>
     </extension>
-</addon>
-
-<addon id="plugin.video.vio24.com" name="Vio24.com (UnifiedSearch)" version="3.0.4" provider-name="MrStealth">
-  <requires>
-    <import addon="xbmc.python" version="2.1.0"/>
-    <import addon="script.module.kodi.utils" version="3.0.0"/>
-    <import addon="script.module.translit" version="3.0.0"/>
-    <import addon="script.module.beautifulsoup" version="3.2.1"/>
-    <import addon="script.module.link.grabber" version="1.0.1"/>
-  </requires>
-  <extension point="xbmc.python.pluginsource" provides="video" library="default.py">
-    <provides>video</provides>
-  </extension>
-  <extension point="xbmc.addon.metadata">
-    <summary>Vio24.com</summary>
-    <description>Фильмы и сериалы онлай</description>
-    <disclaimer>For personal use only</disclaimer>
-    <platform>all</platform>
-  </extension>
 </addon>
 
   <addon id="repository.mrstealth" name="MrStealth Kodi Isengard" version="1.0.0" provider-name="mrstealth">
