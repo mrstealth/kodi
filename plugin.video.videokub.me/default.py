@@ -31,7 +31,7 @@ class VideoKub():
         self.translit = self.addon.getSetting('translit')
         self.inext = os.path.join(self.path, 'resources/icons/next.png')
         self.handle = int(sys.argv[1])
-        self.url = 'http://videokub.net/'
+        self.url = 'http://videokub.me'
 
     def main(self):
         params = common.getParameters(sys.argv[2])
@@ -66,18 +66,16 @@ class VideoKub():
         item = xbmcgui.ListItem("[B][COLOR=FF00FFF0]%s[/COLOR][/B]" % self.language(1003), iconImage=self.icon, thumbnailImage=self.icon)
         xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
 
-        self.index('http://videokub.net/latest-updates/', 1)
+        self.index('http://videokub.me/latest-updates', 1)
         xbmcplugin.endOfDirectory(self.handle, True)
 
     def genres(self):
 
-        url = 'http://videokub.net/categories/'
+        url = 'http://videokub.me/categories/'
         response = common.fetchPage({"link": url})
-        block_content = common.parseDOM(response["content"], "div", attrs={"class": "block_content"})
 
-        titles = common.parseDOM(block_content, "a", attrs={"class": "hl"})
-        links = common.parseDOM(block_content, "a", attrs={"class": "hl"}, ret='href')
-        images = common.parseDOM(block_content, "img", attrs={"class": "thumb"}, ret='src')
+        links = common.parseDOM(response["content"], "a", attrs={"class": "item"}, ret="href")
+        titles = common.parseDOM(response["content"], "a", attrs={"class": "item"}, ret="title")
 
         for i, title in enumerate(titles):
             if 'http' in links[i]:
@@ -86,7 +84,7 @@ class VideoKub():
                 link = self.url + links[i]
 
             uri = sys.argv[0] + '?mode=%s&url=%s' % ("index", link)
-            item = xbmcgui.ListItem(title, iconImage=images[i], thumbnailImage=images[i])
+            item = xbmcgui.ListItem(title, iconImage=self.icon, thumbnailImage=self.icon)
             xbmcplugin.addDirectoryItem(self.handle, uri, item, True)
 
 
@@ -94,21 +92,27 @@ class VideoKub():
 
 
     def index(self, url, page):
-        page_url = "%s%s/" % (url, page)
+        page_url = "%s/%s/" % (url, page)
 
-        print "Get videos for page_url %s" % page_url
+        xbmc.log("Get videos for page_url %s" % page_url)
         response = common.fetchPage({"link": page_url})
-        content = common.parseDOM(response["content"], "div", attrs={"class": "list_videos"})
-        videos = common.parseDOM(content, "div", attrs={"class": "short"})
+        items = common.parseDOM(response["content"], "div", attrs={"class": "item  "})
+        links = common.parseDOM(items, "a", ret="href")
+        titles = common.parseDOM(items, "a", ret="title")
 
-        links = common.parseDOM(videos, "a", attrs={"class": "kt_imgrc"}, ret='href')
-        titles = common.parseDOM(videos, "a", attrs={"class": "kt_imgrc"}, ret='title')
-        images = common.parseDOM(videos, "img", attrs={"class": "thumb"}, ret='src')
+        images = common.parseDOM(items, "img", attrs={"class": "thumb lazy-load"}, ret="data-original")
+        durations = common.parseDOM(items, "div", attrs={"class": "duration"})
 
-        durations = common.parseDOM(videos, "span", attrs={"class": "time"})
+        xbmc.log(links[0])
+        print len(images)
+        print len(durations)
+
+        # print infos[0]
 
         for i, title in enumerate(titles):
             duration = durations[i].split(':')[0]
+
+            xbmc.log(images[i])
 
             uri = sys.argv[0] + '?mode=show&url=%s' % links[i]
             item = xbmcgui.ListItem("%s [COLOR=55FFFFFF](%s)[/COLOR]" % (title, durations[i]), iconImage=images[i], thumbnailImage=images[i])
@@ -122,23 +126,29 @@ class VideoKub():
         xbmc.executebuiltin('Container.SetViewMode(52)')
         xbmcplugin.endOfDirectory(self.handle, True)
 
+
+
     def show(self, url):
-        print "Get video %s" % url
+        xbmc.log("Get video %s" % url)
         response = common.fetchPage({"link": url})
-        content = response["content"]
-        scripts = common.parseDOM(response["content"], "script", attrs={"class": "splayer"})
-        title = common.parseDOM(response["content"], "div", attrs={"class": "title"})[0]
-        urls = []
+        content = common.parseDOM(response["content"], "div", attrs={"class": "content"})
+        player = common.parseDOM(content, "div", attrs={"class": "player"})
+        title = common.parseDOM(content, "h1")[0]
+        scripts = common.parseDOM(player, "script")
+        media_link = None
 
-        for script in scripts:
-            if 'mp4' in script:
-                urls = re.findall('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+.mp4', script)
+        for i, script in enumerate(scripts):
+            if('src=' in script):
+                print 'Found media link'
+                media_link = script.split('src="')[-1].split('"')[0]
 
-        link = urls[-1]
-
-        print "link %s" % link
-
-        search_string = title.split(' ')
+        response = common.fetchPage({"link": media_link})
+        scripts = common.parseDOM(response["content"], "script")
+        link = None
+        for i, script in enumerate(scripts):
+            if('video_url:' in script):
+                print 'Found video link'
+                link = script.split("video_url: '")[-1].split("'")[0]
 
         item = xbmcgui.ListItem(title, thumbnailImage=self.icon, iconImage=self.icon)
         item.setInfo(type='Video', infoLabels={'title': title, 'overlay': xbmcgui.ICON_OVERLAY_WATCHED, 'playCount': 0})

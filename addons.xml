@@ -102,7 +102,7 @@
   </extension>
 </addon>
 
-<addon id="plugin.video.videokub.me" name="VideoKub.me" version="3.0.1" provider-name="mrstealth">
+<addon id="plugin.video.videokub.me" name="VideoKub.me" version="3.0.2" provider-name="mrstealth">
     <requires>
         <import addon="xbmc.python" version="2.1.0"/>
         <import addon="script.module.kodi.utils" version="3.0.0"/>
