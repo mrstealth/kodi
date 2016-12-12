@@ -168,6 +168,8 @@ class OnlineLife():
     def getFilmInfo(self, url):
         response = common.fetchPage({"link": url})
 
+        xbmc.log(url)
+
         content = common.parseDOM(response["content"], "div", attrs={"id": "dle-content"})
         story = common.parseDOM(response["content"], "div", attrs={"class": "full-story"})
 
@@ -198,11 +200,12 @@ class OnlineLife():
 
         elif season:
             print "This is a season %s" % season
+            xbmc.log(season)
             response = common.fetchPage({"link": season})
-            print response
             overlay = xbmcgui.ICON_OVERLAY_WATCHED
 
             if response["status"] == 200:
+                # xbmc.log(response["content"])
                 response = eval(response["content"].replace('\t', '').replace('\r\n', ''))
 
                 if 'playlist' in response['playlist'][0]:
@@ -251,26 +254,18 @@ class OnlineLife():
 
         print "***** ID %s" % id
         url = "http://dterod.com/js.php?id=%s" % id
-        print "************ URL %s" % url
+        xbmc.log("************ URL %s" % url)
 
         request = urllib2.Request(url)
-        request.add_header('Referer', 'http://www.online-life.cc/')
-        request.add_header('Host', 'www.online-life.cc')
+        request.add_header('Host', 'dterod.com')
+        request.add_header('Referer', url)
+        request.add_header('User-Agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2927.0 Safari/537.36')
+
         response = urllib2.urlopen(request).read()
 
-        # print "dterod"
-        # print URLParser().parse(response)[0]
-        #
-        # url = 'http://www.online-life.cc/js.php?id=%s' % id
-        #
-        # request = urllib2.Request(url)
-        # request.add_header('Referer', 'http://www.online-life.cc/')
-        # request.add_header('Host', 'www.online-life.cc')
-        # response = urllib2.urlopen(request).read()
-        #
-        # print "online"
-        # print URLParser().parse(response)[0]
-        return URLParser().parse(response)[0]
+        url = URLParser().parse(response)[0]
+        xbmc.log(url)
+        return url
 
 
     def listGenres(self, url):
@@ -282,8 +277,6 @@ class OnlineLife():
 
 
         cats = common.parseDOM(container, "li", attrs={"class": "pull-right nodrop"})
-
-
         titles += common.parseDOM(cats, "a")
         links += common.parseDOM(cats, "a", ret="href")
 
