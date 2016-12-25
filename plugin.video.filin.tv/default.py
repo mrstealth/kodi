@@ -463,22 +463,25 @@ def showItem(url, thumbnail):
           playlist = json.loads(response)['playlist']
 
         if 'playlist' in playlist[0]:
-            print "*** This is a playlist with several seasons"
+            xbmc.log("*** This is a playlist with several seasons")
 
             for season in playlist:
                 episods = season['playlist']
                 for episode in episods:
                     title = ('%s (%s)') % (episode['comment'], season['comment'])
-                    url = episode['file'].replace('[', '').replace(',360]', '')
+                    url = episode['file'].replace('[', '').replace(',360]', '').replace(',]', '')
+                    xbmc.log(url)
+
                     item = xbmcgui.ListItem(title, thumbnailImage=image)
                     item.setInfo(type='video', infoLabels={'genre': 'genre', 'plot': 'desc' })
                     item.setProperty('IsPlayable', 'true')
                     xbmcplugin.addDirectoryItem(pluginhandle, url, item, False)
 
         else:
-            print "*** This is a playlist with one season"
+            xbmc.log("*** This is a playlist with one season")
             for episode in playlist:
-                url = episode['file'].replace('[', '').replace(',360]', '')
+                xbmc.log(episode['file'])
+                url = episode['file'].replace('[', '').replace(',360]', '').replace(',]', '')
                 item = xbmcgui.ListItem(episode['comment'], thumbnailImage=image)
                 item.setInfo(type='video', infoLabels={'genre': 'genre', 'plot': 'desc' })
                 item.setProperty('IsPlayable', 'true')
@@ -501,8 +504,9 @@ def showItem(url, thumbnail):
 
 def playItem(url):
     print "Play item"
+    xbmc.log(url)
     if '480' in url:
-        url = url.replace('[', '').replace(',360]', '')
+        url = url.replace('[', '').replace(',360]', '').replace(',]', '')
     print url
     item = xbmcgui.ListItem(path = url)
     item.setProperty('mimetype', 'video/x-flv')
