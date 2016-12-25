@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.videokub.me" name="VideoKub.me" version="3.0.2" provider-name="mrstealth">
+<addon id="plugin.video.videokub.me" name="VideoKub.me" version="3.0.3" provider-name="mrstealth">
     <requires>
         <import addon="xbmc.python" version="2.1.0"/>
         <import addon="script.module.kodi.utils" version="3.0.0"/>
